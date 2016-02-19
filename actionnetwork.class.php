@@ -192,6 +192,7 @@ class ActionNetworkPerson {
 	public $given_name = null;
 	public $postal_addresses = array();
 	public $email_addresses = array();
+	public $identifiers = array();
 	public $custom_fields;
 
 	private $valid_subscription_statuses = array('subscribed', 'unsubscribed', 'bouncing', 'spam complaint');
@@ -206,6 +207,11 @@ class ActionNetworkPerson {
 		if (isset($person->email_addresses) && is_array($person->email_addresses)) {
 			foreach($person->email_addresses as $index => $email_address) {
 				if (is_array($email_address)) { $person->email_addresses[$index] = (object) $email_address; }
+			}
+		}
+		if (isset($person->identifiers) && is_array($person->identifiers)) {
+			foreach($person->identifiers as $index => $identifier) {
+				$this->identifiers[] = $identifier;	
 			}
 		}
 		if (!isset($person->email_addresses[0]->address) || !filter_var($person->email_addresses[0]->address, FILTER_VALIDATE_EMAIL)) trigger_error('person must include a valid email address', E_USER_ERROR);
@@ -275,6 +281,14 @@ class ActionNetworkPerson {
 	public function setSubscriptionStatus($status) {
 		if (in_array($status, $this->valid_subscription_statuses)) {
 			$this->email_addresses[0]->status = $status;
+		}
+	}
+	
+	public function addIdentifier($identifier = null) {
+		if ( $identifier != "" ) {
+			if ( !in_array($identifier, $this->identifiers) ) {
+				$this->identifiers[] = $identifier;
+			}
 		}
 	}
 
