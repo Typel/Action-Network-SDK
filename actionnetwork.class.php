@@ -31,30 +31,36 @@ class ActionNetwork {
 					'OSDI-API-Token: '.$this->api_key,
 					'Content-Type: application/json',
 					'Content-Length: ' . strlen($json))
-				);
-			}
-			curl_setopt($ch, CURLOPT_URL, 'https://actionnetwork.org/api/v2/'.$endpoint);
-		} else {
+					);
+				}
+			$request_url = "https://actionnetwork.org/api/v2/".$endpoint;
+			} else if ( $method == "PUT" ) {
+			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+			if ($object) {
+				$json = json_encode($object);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $json);
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+					'OSDI-API-Token: '.$this->api_key,
+					'Content-Type: application/json',
+					'Content-Length: '.strlen($json))
+					);
+				}
+			$request_url = "https://actionnetwork.org/api/v2/".$endpoint;
+			} else {
 			curl_setopt($ch, CURLOPT_HTTPHEADER, array('OSDI-API-Token:'.$this->api_key));
+			$request_url = "https://actionnetwork.org/api/v2/".$endpoint;
 			if ($odata != "") {
 				$request_parameters = array('filter'=>$odata);
-				$request_url = "https://actionnetwork.org/api/v2/".$endpoint;
 				$request_url .= "?".http_build_query($request_parameters);
-				curl_setopt($ch, CURLOPT_URL, $request_url);
-			} else {
-				$request_parameters = array('filter'=>$odata);
-				$request_url = "https://actionnetwork.org/api/v2/".$endpoint;
-				curl_setopt($ch, CURLOPT_URL, $request_url);	
+				}
 			}
-				
-		}
-
+		
+		curl_setopt($ch, CURLOPT_URL, $request_url);
 		$response = curl_exec($ch);
-
 		curl_close($ch);
-
 		return json_decode($response);
-	}
+		
+		}
 
 	// helper functions for collections
 
